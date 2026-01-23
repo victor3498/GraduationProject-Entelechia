@@ -229,7 +229,16 @@ export function SimpleEditor() {
       }),
     ],
     content,
-  })
+
+
+     onUpdate({ editor }) {
+    const json = editor.getJSON()
+    console.log(
+      JSON.stringify(json, null, 2)
+    )
+  },
+})
+
 
   const rect = useCursorVisibility({
     editor,
