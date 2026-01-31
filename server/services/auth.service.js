@@ -25,7 +25,7 @@ const login = async (username, password) => {
     throw new Error('User not found')
   }
 
-  const match = await comparePassword(password, user.password)
+  const match = await comparePassword(password, user.password_hash)
   if (!match) {
     throw new Error('Invalid password')
   }
@@ -38,7 +38,28 @@ const login = async (username, password) => {
   return { token }
 }
 
+/**
+ * 修改密码
+ * @param userId 来自 JWT
+ */
+const changePassword = async (userId, oldPassword, newPassword) => {
+  const user = await userModel.findByUserId(userId)
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  const match = await comparePassword(oldPassword, user.password_hash)
+  if (!match) {
+    throw new Error('Old password is incorrect')
+  }
+
+  const newHashed = await hashPassword(newPassword)
+  await userModel.updatePasswordById(user.id, newHashed)
+}
+
+
 export default {
   register,
   login,
+  changePassword
 }

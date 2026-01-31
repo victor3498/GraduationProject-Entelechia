@@ -1,18 +1,31 @@
-import { verifyToken } from '../utils/jwt.js'
+//验权中间件
+import jwt from 'jsonwebtoken'
 
-export default (req, res, next) => {
-  const auth = req.headers.authorization
-  if (!auth) {
-    return res.status(401).json({ message: 'No token provided' })
+const authMiddleware = (req, res, next) => {
+  const authHeader = req.headers.authorization
+
+  // 1. 是否携带 token
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({
+      message: 'Not authenticated',
+    })
   }
 
-  const token = auth.split(' ')[1]
+  const token = authHeader.split(' ')[1]
 
   try {
-    const decoded = verifyToken(token)
+    // 2. 校验 token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+
+    // 3. 挂载用户信息
     req.user = decoded
+
     next()
-  } catch {
-    res.status(401).json({ message: 'Invalid token' })
+  } catch (err) {
+    return res.status(401).json({
+      message: 'Invalid or expired token',
+    })
   }
 }
+
+export default authMiddleware
