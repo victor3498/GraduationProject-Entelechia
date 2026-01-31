@@ -9,5 +9,6 @@ router.post('/register', authController.register)
 router.post('/change-password', authMiddleware, authController.changePassword)
 router.post('/login', guestOnlyMiddleware, authController.login)
 router.post('/logout', authController.logout)
+router.post('/refresh', authController.refresh)
 
 export default router

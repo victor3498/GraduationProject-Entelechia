@@ -16,7 +16,7 @@ const guestOnlyMiddleware = (req, res, next) => {
 
   try {
     // token 有效 → 已登录
-    jwt.verify(token, process.env.JWT_SECRET)
+    jwt.verify(token, process.env.JWT_ACCESS_SECRET)
     return res.status(400).json({
       message: 'Already logged in',
     })

@@ -7,7 +7,7 @@ const authMiddleware = (req, res, next) => {
   // 1. 是否携带 token
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({
-      message: 'Not authenticated',
+      message: 'Not authenticated token',
     })
   }
 
@@ -15,7 +15,7 @@ const authMiddleware = (req, res, next) => {
 
   try {
     // 2. 校验 token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET)
 
     // 3. 挂载用户信息
     req.user = decoded

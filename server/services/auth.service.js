@@ -1,7 +1,8 @@
 //负责用户注册、登录的业务规则判断与安全控制
 import userModel from '../models/user.model.js'
 import { hashPassword, comparePassword } from '../utils/password.js'
-import { signToken } from '../utils/jwt.js'
+import { signAccessToken,signRefreshToken } from '../utils/jwt.js'
+import * as refreshTokenModel from '../models/refreshToken.model.js'
 
 const register = async (username, password) => {
   const exist = await userModel.findByUsername(username)
@@ -30,12 +31,25 @@ const login = async (username, password) => {
     throw new Error('Invalid password')
   }
 
-  const token = signToken({
-    id: user.id,
-    username: user.username,
-  })
+const payload = { id: user.id, username: user.username }
 
-  return { token }
+  const accessToken = signAccessToken(payload)
+  const refreshToken = signRefreshToken(payload)
+
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)//七天后过期
+
+await refreshTokenModel.saveRefreshToken(
+    user.id,
+    refreshToken,
+    expiresAt
+  )
+await refreshTokenModel.deleteByUserId(user.id)//登录前先清理旧 token
+
+  return {
+    accessToken,
+    refreshToken,
+  }
+ 
 }
 
 /**
