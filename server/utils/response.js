@@ -1,7 +1,7 @@
-export const success = (res, data = null) => {
+export const success = (res, mes = "ok",data = null) => {
   res.json({
     code: 0,
-    message: 'ok',
+    message: mes,
     data,
   })
 }

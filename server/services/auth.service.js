@@ -43,7 +43,7 @@ await refreshTokenModel.saveRefreshToken(
     refreshToken,
     expiresAt
   )
-await refreshTokenModel.deleteByUserId(user.id)//登录前先清理旧 token
+await refreshTokenModel.deleteUserRefreshTokens(user.id)//登录前先清理旧 token
 
   return {
     accessToken,
@@ -69,6 +69,8 @@ const changePassword = async (userId, oldPassword, newPassword) => {
 
   const newHashed = await hashPassword(newPassword)
   await userModel.updatePasswordById(user.id, newHashed)
+  await refreshTokenModel.deleteUserRefreshTokens(userId)
+
 }
 
 

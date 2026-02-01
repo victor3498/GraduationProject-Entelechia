@@ -8,7 +8,7 @@ const register = async (req, res, next) => {
   try {
     const { username, password } = req.body
     const user = await authService.register(username, password)
-    success(res, user)
+    success(res,"register success", user)
   } catch (err) {
     next(err)
   }
@@ -18,7 +18,7 @@ const login = async (req, res, next) => {
   try {
     const { username, password } = req.body
     const result = await authService.login(username, password)
-    success(res, result)
+    success(res, "login success",result)
   } catch (err) {
     next(err)
   }
@@ -48,7 +48,7 @@ const refresh = async (req, res, next) => {
       username: decoded.username,
     })
 
-    success(res, { accessToken: newAccessToken })
+    success(res, "refresh success",{ accessToken: newAccessToken })
   } catch (err) {
     next(err)
   }
@@ -67,7 +67,7 @@ const changePassword = async (req, res, next) => {
     const userId = req.user.id   // 来自 JWT
 
     await authService.changePassword(userId, oldPassword, newPassword)
-    success(res)
+    success(res,"changePassword success")
   } catch (err) {
     next(err)
   }
@@ -83,7 +83,7 @@ const logout = async (req, res, next) => {
     if (refreshToken) {
       await refreshTokenModel.deleteRefreshToken(refreshToken)
     }
-    success(res)
+    success(res,"logout")
   } catch (err) {
     next(err)
   }
