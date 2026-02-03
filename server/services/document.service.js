@@ -1,10 +1,28 @@
 // src/services/document.service.js
 import documentModel from '../models/document.model.js'
+const initdocument={}
 
 /**
  * 新建文档
  */
-async function createDocument(userId, title = '未命名文档', content = {}) {
+async function createDocument(userId, title = '未命名文档', content = {
+   "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 1
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Getting started"
+          }
+        ]
+      }
+    ]
+}) {
   return await documentModel.createDocument({
     userId,
     title,
