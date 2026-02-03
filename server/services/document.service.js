@@ -1,6 +1,6 @@
 // src/services/document.service.js
 import documentModel from '../models/document.model.js'
-const initdocument={}
+
 
 /**
  * 新建文档
@@ -34,7 +34,7 @@ async function createDocument(userId, title = '未命名文档', content = {
  * 删除文档
  */
 async function deleteDocument(userId, documentId) {
-  const result = await documentModel.deleteDocument(userId, documentId)
+  const result = await documentModel.deleteDocument({userId, documentId})
 
   if (!result) {
     throw new Error('文档不存在或已删除')
@@ -89,7 +89,7 @@ async function saveDocumentContent(userId, documentId, content) {
  * 获取文档列表（不含内容）
  */
 async function getDocumentList(userId) {
-  return await documentModel.getDocumentList(userId)
+  return await documentModel.getDocumentList({userId})
 }
 
 /**
@@ -108,10 +108,10 @@ async function queryDocuments(userId, query) {
  * @param withContent 是否包含 content
  */
 async function getDocumentDetail(userId, documentId, withContent = true) {
-  const doc = await documentModel.getDocumentById(
+  const doc = await documentModel.getDocumentById({
     userId,
     documentId,
-    withContent
+    withContent}
   )
 
   if (!doc) {

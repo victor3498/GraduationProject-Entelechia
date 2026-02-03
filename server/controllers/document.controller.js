@@ -90,8 +90,9 @@ export async function saveDocumentContent(req, res, next) {
 export async function getDocumentList(req, res, next) {
   try {
     const userId = req.user.id
-
+    console.log('传入的 userId:', userId, '类型:', typeof userId)
     const docs = await documentService.getDocumentList(userId)
+    console.log(docs,userId)
 
     // res.json(docs)
     success(res,"get document list success",docs)
