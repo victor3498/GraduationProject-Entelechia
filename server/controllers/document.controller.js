@@ -90,7 +90,6 @@ export async function saveDocumentContent(req, res, next) {
 export async function getDocumentList(req, res, next) {
   try {
     const userId = req.user.id
-    console.log('传入的 userId:', userId, '类型:', typeof userId)
     const docs = await documentService.getDocumentList(userId)
     console.log(docs,userId)
 
@@ -107,8 +106,14 @@ export async function getDocumentList(req, res, next) {
 export async function queryDocuments(req, res, next) {
   try {
     const userId = req.user.id
-
-    const docs = await documentService.queryDocuments(userId, req.query)
+    const {keyword,isStarred}=req.query
+    const docs = await documentService.queryDocuments(userId, {
+      keyword,
+      isStarred:
+        isStarred === undefined
+          ? undefined
+          : isStarred === 'true',
+    })
 
     // res.json(docs)
     success(res,"query document success",docs)

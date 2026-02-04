@@ -39,6 +39,8 @@ const updatePasswordById = async (userId, newHashedPassword) => {
   )
 }
 
+
+
 export default {
   findByUsername,
   findByUserId,
