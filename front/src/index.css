@@ -1,5 +1,8 @@
 @import '@/styles/_variables.scss';
 @import '@/styles/_keyframe-animations.scss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
