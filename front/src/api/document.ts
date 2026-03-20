@@ -54,7 +54,7 @@ export function searchDocApi(params: searchDocParams) {
     }),
   }).toString()
 
-  return http<ApiResponse<searchDocResult[]>>(
+  return http<ApiResponse<searchDocResult>>(
     `/doc/search?${query}`
   )
 }

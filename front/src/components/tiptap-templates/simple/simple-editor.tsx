@@ -74,6 +74,11 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
 import content from "@/components/tiptap-templates/simple/data/content.json"
+import type { JSONContent } from "@tiptap/react"
+
+interface SimpleEditorProps {
+  content?: JSONContent
+}
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -183,7 +188,7 @@ const MobileToolbarContent = ({
   </>
 )
 
-export function SimpleEditor() {
+export function SimpleEditor({ content }: SimpleEditorProps) {
   const isMobile = useIsBreakpoint()
   const { height } = useWindowSize()
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
@@ -228,7 +233,14 @@ export function SimpleEditor() {
         onError: (error) => console.error("Upload failed:", error),
       }),
     ],
-    content,
+    content: content ?? {
+  type: "doc",
+  content: [
+    {
+      type: "paragraph",
+    },
+  ],
+},
 
 
      onUpdate({ editor }) {

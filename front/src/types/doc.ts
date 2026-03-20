@@ -44,13 +44,16 @@ export interface saveDocResult {
 
 //http://localhost:3000/api/doc/search?{keyword}&?{isStarred} GET
 //示例：/api/doc/search?keyword=项目&isStarred=true
-
-export interface searchDocResult{
+export type searchDocType={
     id:number,
     title: string,
     is_starred: boolean,
     created_at: string,
     updated_at: string
+}
+
+export interface searchDocResult{
+   searched_list:searchDocType[]
 }
 
 //http://localhost:3000/api/doc/{id} GET
