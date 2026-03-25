@@ -1,8 +1,21 @@
 #root {
-  max-width: 1280px;
+  max-width: 1600px;
+  width: 100%;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0rem;
   text-align: center;
+}
+
+@media (max-width: 1600px) {
+  #root {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  #root {
+    padding: 0 0.5rem;
+  }
 }
 
 .logo {

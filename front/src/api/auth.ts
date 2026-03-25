@@ -4,10 +4,6 @@ import type {LoginParams,LoginResult,registerParams,Logout,changePasswordParams,
 
 
 export async function loginApi(data: LoginParams){
-    // return http<ApiResponse<LoginResult>>("/auth/login",{
-    //     method:"POST",
-    //     body: JSON.stringify(data),
-    // })
     const res = await http<ApiResponse<LoginResult>>("/auth/login",{
         method: "POST",
         body: JSON.stringify(data),

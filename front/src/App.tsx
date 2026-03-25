@@ -7,8 +7,10 @@ import { Button } from "@/components/component/ui/Buttton";
 import { DocumentCard } from './components/component/document/DocumentItem'
 import Input  from './components/component/ui/Input/Input'
 import AuthTestPage from './pages/testPages/authapiTest'
-import DocApiTestPage from './pages/testPages/DocApiTestPage'
-
+import LoginOrRes from './pages/LoginOrRes'
+import MainPage from './pages/mainPage'
+import content from "@/components/tiptap-templates/simple/data/content.json"
+import DocumentToolbar from './components/component/document/DocumentToolbar'
 function App() {
 
 // const data={ "id": 4,
@@ -27,10 +29,9 @@ function App() {
   return (
     <>
       <div >
-
-     
-     <DocApiTestPage/>
-      
+     <MainPage/>
+     {/* <SimpleEditor content={content}/>   */}
+      {/* <DocumentToolbar/> */}
     </div>
     </>
   )

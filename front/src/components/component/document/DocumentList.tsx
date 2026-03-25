@@ -14,7 +14,7 @@ interface DocumentListProps{
 
 export const DocList: React.FC<DocumentListProps>=({
      documents,
-     width="170px",
+     width="250px",
      itemHeight="30px",
      onOpen,
      onStar,
@@ -26,8 +26,9 @@ export const DocList: React.FC<DocumentListProps>=({
         return(
             <div
              style={{width}}
-             className="text-xs text-neutral-400 text-center py-4"
+             className="text-xs text-neutral-400 text-center py-8 px-4 bg-white rounded-md border border-neutral-200 shadow-sm"
              >
+              <div className="mb-2">📄</div>
               暂无文档
             </div>
         )
@@ -38,7 +39,12 @@ export const DocList: React.FC<DocumentListProps>=({
         style={{width}}
         className="flex
         flex-col
-        gap-1"
+        bg-white
+        rounded-md
+        border
+        border-neutral-200
+        shadow-sm
+        overflow-hidden"
         >
          {documents.map((doc) => (
         <DocumentCard

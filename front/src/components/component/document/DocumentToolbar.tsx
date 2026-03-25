@@ -25,8 +25,8 @@ interface DocToolbarProps {
 }
 
 export default function DocToolbar({
-  width = 200,
-  height = 50,
+  width = 400,
+  height = 40,
   onSearch,
 }: DocToolbarProps) {
   const [keyword, setKeyword] = useState("")
@@ -69,32 +69,42 @@ export default function DocToolbar({
 
   return (
     <div
-      style={{ width, height }}
-      className="flex items-center gap-2 px-2"
+      style={{ width, height ,gap:3}}
+      className="flex items-center "
     >
       {/* 输入搜索关键词 */}
       <Input
         placeholder="搜索文档名..."
+        width={175}
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
+        height={height}
       />
 
       {/* 是否只显示星标 */}
       <Button
-        variant={isStarred ? "primary" : "ghost"}
+        width={25}
+        height={40}
+        variant={isStarred ? "primary" : "secondary"}
         onClick={() => setIsStarred(!isStarred)}
       >
         <StarIcon />
       </Button>
 
       {/* 执行搜索 */}
-      <Button onClick={handleSearch} loading={loading}>
+      <Button 
+        variant="secondary"
+        width={25}
+        height={40}
+        onClick={handleSearch} >
         <DocSearchIcon />
       </Button>
 
       {/* 排序切换 */}
       <Button
-        variant="ghost"
+        width={25}
+        height={40}
+        variant="secondary"
         onClick={() =>
           setSortType(sortType === "latest" ? "oldest" : "latest")
         }

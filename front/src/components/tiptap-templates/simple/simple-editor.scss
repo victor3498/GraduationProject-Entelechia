@@ -60,8 +60,14 @@ body,
   overflow: auto;
 }
 
+.tiptap-toolbar[data-variant="fixed"] {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 3rem;
+}
+
 .simple-editor-content {
-  max-width: 648px;
+  max-width: 780px;
   width: 100%;
   margin: 0 auto;
   height: 100%;

@@ -30,9 +30,10 @@ export default function Input({
   height,
   placeholder,
   style,
+  onValidChange,
   onChange,
   ...props
-}: InputProps) {
+}: InputProps & {onValidChange?:(valid: boolean,value: string)=> void}) {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
 
@@ -54,18 +55,21 @@ export default function Input({
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setValue(val);
-
+    let isValid = true;
     /** password 校验 */
     if (variant === "password") {
       if (!passwordRegex.test(val)) {
         setError(
           "密码至少8位，最多13位，需包含字母和数字"
+        
         );
+        isValid = false;
       } else {
         setError("");
+         isValid = true;
       }
     }
-
+     onValidChange?.(isValid, val);
     onChange?.(e);
   };
 
