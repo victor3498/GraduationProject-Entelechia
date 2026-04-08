@@ -33,7 +33,11 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
   }
 
   return (
-    <div className="flex items-center bg-white hover:bg-neutral-100 transition cursor-pointer border-b border-neutral-200 h-full last:border-b-0" style={{ width }}>
+    <div 
+      className="flex items-center bg-white hover:bg-neutral-100 transition cursor-pointer border-b border-neutral-200 h-full last:border-b-0" 
+      style={{ width }}
+      onClick={() => onOpen?.(id)}
+    >
       {/* star */}
       <Button
         onClick={(e) => {
@@ -71,7 +75,6 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
       >
         <div
           style={{ flex: 1, minWidth: 0 }}
-          onClick={() => onOpen?.(id)}
           className="flex items-center h-full px-3"
         >
           {/* title */}

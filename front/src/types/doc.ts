@@ -1,5 +1,6 @@
 //以下调用全附带Auth-Bearer Token,是accessToken
 
+import type { JSONContent } from "@tiptap/react"
 //http://localhost:3000/api/doc  POST
 export interface createDocParams {
     title: string
@@ -60,7 +61,7 @@ export interface searchDocResult{
 export interface getDocDetail{
     id: number,
     title: string,
-    content: unknown,
+    content: JSONContent,
     is_starred: boolean,
     created_at: string,
     updated_at: string
@@ -69,7 +70,7 @@ export interface getDocDetail{
 export type docItem={
     id: number,
     title: string,
-    content: unknown,
+    content: JSONContent,
     is_starred: boolean,
     created_at: string,
     updated_at: string

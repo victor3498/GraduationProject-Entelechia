@@ -54,6 +54,7 @@ import { MarkButton } from "@/components/tiptap-ui/mark-button"
 import { TextAlignButton } from "@/components/tiptap-ui/text-align-button"
 import { UndoRedoButton } from "@/components/tiptap-ui/undo-redo-button"
 import { ContentSaveButton } from "@/components/tiptap-ui/contentsave-button"
+import { ReturnButton}  from "@/components/tiptap-ui/return-button"
 
 // --- Icons ---
 import { ArrowLeftIcon } from "@/components/tiptap-icons/arrow-left-icon"
@@ -85,12 +86,14 @@ interface SimpleEditorProps {
   onTitleChange?: (title: string) => void
   docId?: number
   onSave?: () => void
+  onReturn?: () => void
   onSaveError?: (error: Error) => void
 }
 
 const MainToolbarContent = ({
   onHighlighterClick,
   onLinkClick,
+  handleReturn,
   isMobile,
   handleSave,
 }: {
@@ -98,19 +101,20 @@ const MainToolbarContent = ({
   onLinkClick: () => void
   isMobile: boolean
   handleSave: () => void
+  handleReturn: () => void
 }) => {
   return (
     <>
       <Spacer />
 
-      <ToolbarGroup>
+      {/* <ToolbarGroup>
         <UndoRedoButton action="undo" />
         <UndoRedoButton action="redo" />
       </ToolbarGroup>
 
-      <ToolbarSeparator />
+      <ToolbarSeparator /> */}
 
-      <ToolbarGroup>
+      {/* <ToolbarGroup>
         <HeadingDropdownMenu levels={[1, 2, 3, 4]} portal={isMobile} />
         <ListDropdownMenu
           types={["bulletList", "orderedList", "taskList"]}
@@ -118,9 +122,9 @@ const MainToolbarContent = ({
         />
         <BlockquoteButton />
         <CodeBlockButton />
-      </ToolbarGroup>
+      </ToolbarGroup> */}
 
-      <ToolbarSeparator />
+      {/* <ToolbarSeparator /> */}
 
       <ToolbarGroup>
         <MarkButton type="bold" />
@@ -133,27 +137,29 @@ const MainToolbarContent = ({
         ) : (
           <ColorHighlightPopoverButton onClick={onHighlighterClick} />
         )}
-        {!isMobile ? <LinkPopover /> : <LinkButton onClick={onLinkClick} />}
+        {/* {!isMobile ? <LinkPopover /> : <LinkButton onClick={onLinkClick} />} */}
+       <ContentSaveButton onClick={handleSave} />
+       <ReturnButton onClick={handleReturn} />
+
       </ToolbarGroup>
 
-      <ToolbarSeparator />
+      {/* <ToolbarSeparator />
 
       <ToolbarGroup>
         <MarkButton type="superscript" />
         <MarkButton type="subscript" />
       </ToolbarGroup>
 
-      <ToolbarSeparator />
+      <ToolbarSeparator /> */}
 
-      <ToolbarGroup>
+      {/* <ToolbarGroup>
         <TextAlignButton align="left" />
         <TextAlignButton align="center" />
         <TextAlignButton align="right" />
         <TextAlignButton align="justify" />
-        <ContentSaveButton onClick={handleSave} />
-      </ToolbarGroup>
+      </ToolbarGroup> */}
 
-      <ToolbarSeparator />
+      {/* <ToolbarSeparator /> */}
 
       {/* <ToolbarGroup>
         <ImageUploadButton />
@@ -161,7 +167,7 @@ const MainToolbarContent = ({
 
       <Spacer />
 
-      {isMobile && <ToolbarSeparator />}
+      {/* {isMobile && <ToolbarSeparator />} */}
 
       {/* <ToolbarGroup>
         <ThemeToggle />
@@ -199,7 +205,7 @@ const MobileToolbarContent = ({
   </>
 )
 
-export function SimpleEditor({ content, onContentChange, docTitle, onTitleChange, docId, onSave, onSaveError }: SimpleEditorProps) {
+export default function SimpleEditorMobile({ content, onContentChange, docTitle, onTitleChange, docId, onSave, onSaveError, onReturn }: SimpleEditorProps) {
   const isMobile = useIsBreakpoint()
   const { height } = useWindowSize()
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
@@ -294,6 +300,9 @@ export function SimpleEditor({ content, onContentChange, docTitle, onTitleChange
       onTitleChange(newTitle);
     }
   };
+  const handleReturn = () => {
+    onReturn?.();
+  };
 
   const handleSave = async () => {
     if (!docId || !editor) return;
@@ -332,6 +341,7 @@ export function SimpleEditor({ content, onContentChange, docTitle, onTitleChange
               onLinkClick={() => setMobileView("link")}
               isMobile={isMobile}
               handleSave={handleSave}
+              handleReturn={handleReturn}
             />
           ) : (
             <MobileToolbarContent
