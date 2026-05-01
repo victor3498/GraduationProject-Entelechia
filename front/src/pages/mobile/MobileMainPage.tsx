@@ -8,6 +8,8 @@ import type { DocumentItem } from "@/components/component/document/document.type
 import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor.tsx'
 import type { JSONContent } from "@tiptap/react"
 import { LogoutIcon } from "@/components/component/svg/logout";
+import { SetIcon } from "@/components/component/svg/set";
+import { ShareDialog } from "@/components/component/document/ShareDialog";
 
 // 用户数据
 const currentUser = {
@@ -30,6 +32,14 @@ export default function MobileMainPage() {
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentView, setCurrentView] = useState<'list' | 'editor'>('list');
+  const [shareDialogDoc, setShareDialogDoc] = useState<DocumentItem | null>(null);
+
+  const handleShareDocument = (id: number) => {
+    const doc = documents.find((d) => d.id === id) || filteredDocuments.find((d) => d.id === id);
+    if (doc) {
+      setShareDialogDoc(doc);
+    }
+  };
 
   // 初始化加载文档
   useEffect(() => {
@@ -399,8 +409,8 @@ export default function MobileMainPage() {
                 {currentUser.avatar}
               </div>
               <div>
-                <p className="font-medium">{currentUser.name}</p>
-                <p className="text-xs text-gray-400">user@example.com</p>
+                <p className="font-medium">User</p>
+                <p className="text-xs text-gray-400"></p>
               </div>
             </div>
           </div>
@@ -428,6 +438,26 @@ export default function MobileMainPage() {
               className={`w-full justify-start px-4 py-3 text-left ${viewMode === "starred" ? "bg-gray-800" : ""}`}
             >
               ⭐ 标星文档
+            </Button>
+            <Button
+            onClick={()=>{navigate('/mobile/user')}}
+            variant={"ghost"}
+            size="sm"
+            className={`w-full justify-start px-4 py-3 text-left ${viewMode === "starred" ? "bg-gray-800" : ""}`}
+            >
+              ⚙️ 用户界面
+            </Button>
+
+            <Button
+              onClick={() => {
+                navigate("/mobile/share", { state: { from: "/mobile" } });
+                setSidebarOpen(false);
+              }}
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start px-4 py-3 text-left"
+            >
+              🔗 通过分享码访问
             </Button>
           </div>
           
@@ -487,6 +517,7 @@ export default function MobileMainPage() {
                   onOpen={handleOpenDocument}
                   onStar={handleStarDocument}
                   onDelete={handleDeleteDocument}
+                  onShare={handleShareDocument}
                 />
               )}
             </div>
@@ -520,6 +551,15 @@ export default function MobileMainPage() {
           </div>
         )}
       </div>
+
+      {/* 分享弹窗 */}
+      <ShareDialog
+        open={shareDialogDoc !== null}
+        documentId={shareDialogDoc?.id ?? null}
+        documentTitle={shareDialogDoc?.title}
+        onClose={() => setShareDialogDoc(null)}
+        linkPrefix={`${typeof window !== 'undefined' ? window.location.origin : ''}/mobile/share`}
+      />
     </div>
   );
 }

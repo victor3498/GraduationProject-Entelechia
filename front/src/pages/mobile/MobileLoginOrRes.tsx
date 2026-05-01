@@ -101,7 +101,7 @@ export default function MobileLoginOrRes() {
           </div>
 
           {/* tab 切换 */}
-          <div className="flex mb-8 bg-gray-100 p-1 rounded-lg">
+          <div className="flex mb-4 bg-gray-100 p-1 rounded-lg">
             <button
               onClick={() => setTab("login")}
               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-300 ${
@@ -122,6 +122,19 @@ export default function MobileLoginOrRes() {
               }`}
             >
               账号注册
+            </button>
+          </div>
+
+          {/* 分享码访问入口 */}
+          <div className="mb-6 text-center">
+            <button
+              type="button"
+              onClick={() =>
+                navigate("/mobile/share", { state: { from: "/mobile/login" } })
+              }
+              className="text-sm text-blue-600 hover:underline"
+            >
+              通过分享码访问文档
             </button>
           </div>
 

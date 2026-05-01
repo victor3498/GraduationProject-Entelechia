@@ -8,6 +8,8 @@ import { ProtectedRoute } from "./guards"
 const LogAndResPage = lazy(() => import("../pages/LoginOrRes"))
 const MainPage = lazy(() => import("../pages/mainPage"))
 const UserPage = lazy(() => import("../pages/UserPage"))
+const SharePage = lazy(() => import("../pages/SharePage"))
+const SharedDocPage = lazy(() => import("../pages/SharedDocPage"))
 
 export const routes: RouteObject[] = [
   {
@@ -30,7 +32,16 @@ export const routes: RouteObject[] = [
       </ProtectedRoute>
     ),
   },
-  
+  // 分享相关路由：公开访问，不套 ProtectedRoute，游客可直接进入
+  {
+    path: "/share",
+    element: <SharePage />,
+  },
+  {
+    path: "/share/:code",
+    element: <SharedDocPage />,
+  },
+
   {
     path: "*",
     element: <div>404 Not Found</div>,

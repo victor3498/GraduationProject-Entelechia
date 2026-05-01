@@ -137,6 +137,35 @@ async function queryDocuments({
   return rows
 }
 
+// async function queryDocuments({ 
+//    userId, 
+//    keyword = '', 
+//    isStarred, 
+//  }) { 
+//    let sql = ` 
+//      SELECT id, title, is_starred, created_at, updated_at 
+//      FROM documents 
+//      WHERE user_id = $1 
+//    ` 
+//    const params = [userId] 
+//    let index = 2 
+
+//    if (keyword) { 
+//      sql += ` AND title ILIKE $${index}` 
+//      params.push(`%${keyword}%`) 
+//      index++ 
+//    } 
+
+//    if (typeof isStarred === 'boolean') { 
+//      sql += ` AND is_starred = $${index}` 
+//      params.push(isStarred) 
+//    } 
+
+//    sql += ` ORDER BY updated_at DESC` 
+
+//    const { rows } = await db.query(sql, params) 
+//    return rows 
+//  }
 
 
 export default {

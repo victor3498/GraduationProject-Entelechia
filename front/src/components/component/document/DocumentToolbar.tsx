@@ -43,8 +43,11 @@ export default function DocToolbar({
         keyword,
         isStarred,
       })
+      console.log("调用api结果",res.data)
 
-      const list = res.data?.searched_list|| []
+      const list = Array.isArray(res.data) ? [...res.data] : []
+
+      console.log("下一步list",list)
 
       // 排序逻辑
       const sortedList = [...list].sort((a, b) => {

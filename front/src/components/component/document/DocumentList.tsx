@@ -10,6 +10,7 @@ interface DocumentListProps {
   onOpen?: (id: number) => void
   onStar?: (id: number) => void
   onDelete?: (id: number) => void
+  onShare?: (id: number) => void
 }
 
 export const DocList: React.FC<DocumentListProps> = ({
@@ -19,6 +20,7 @@ export const DocList: React.FC<DocumentListProps> = ({
   onOpen,
   onStar,
   onDelete,
+  onShare,
 }) => {
   // 处理文档打开
   const handleOpen = (id: number) => {
@@ -33,6 +35,11 @@ export const DocList: React.FC<DocumentListProps> = ({
   // 处理文档删除
   const handleDelete = (id: number) => {
     onDelete?.(id)
+  }
+
+  // 处理文档分享
+  const handleShare = (id: number) => {
+    onShare?.(id)
   }
 
   if (documents.length === 0) {
@@ -61,6 +68,7 @@ export const DocList: React.FC<DocumentListProps> = ({
           onOpen={handleOpen}
           onStar={handleStar}
           onDelete={handleDelete}
+          onShare={onShare ? handleShare : undefined}
         />
       ))}
     </div>

@@ -1,9 +1,9 @@
 // src/router/mobile-router.tsx
-import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import { createHashRouter, RouterProvider } from "react-router-dom"
 import { mobileRoutes } from "./mobile-routes"
 import { Suspense } from "react"
 
-const mobileRouter = createBrowserRouter(mobileRoutes)
+const mobileRouter = createHashRouter(mobileRoutes)
 
 export function MobileAppRouter() {
   return (

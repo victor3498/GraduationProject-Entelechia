@@ -88,6 +88,12 @@ interface SimpleEditorProps {
   onSave?: () => void
   onReturn?: () => void
   onSaveError?: (error: Error) => void
+  /** 只读模式：禁用编辑、隐藏保存按钮 */
+  readOnly?: boolean
+  /** 完全隐藏工具栏 */
+  hideToolbar?: boolean
+  /** 自定义保存逻辑（如分享码 PUT） */
+  onCustomSave?: (content: JSONContent) => Promise<void>
 }
 
 const MainToolbarContent = ({
@@ -96,12 +102,14 @@ const MainToolbarContent = ({
   handleReturn,
   isMobile,
   handleSave,
+  readOnly = false,
 }: {
   onHighlighterClick: () => void
   onLinkClick: () => void
   isMobile: boolean
   handleSave: () => void
   handleReturn: () => void
+  readOnly?: boolean
 }) => {
   return (
     <>
@@ -127,18 +135,18 @@ const MainToolbarContent = ({
       {/* <ToolbarSeparator /> */}
 
       <ToolbarGroup>
-        <MarkButton type="bold" />
-        <MarkButton type="italic" />
-        <MarkButton type="strike" />
-        <MarkButton type="code" />
-        <MarkButton type="underline" />
-        {!isMobile ? (
+        {!readOnly && <MarkButton type="bold" />}
+        {!readOnly && <MarkButton type="italic" />}
+        {!readOnly && <MarkButton type="strike" />}
+        {!readOnly && <MarkButton type="code" />}
+        {!readOnly && <MarkButton type="underline" />}
+        {!readOnly && (!isMobile ? (
           <ColorHighlightPopover />
         ) : (
           <ColorHighlightPopoverButton onClick={onHighlighterClick} />
-        )}
+        ))}
         {/* {!isMobile ? <LinkPopover /> : <LinkButton onClick={onLinkClick} />} */}
-       <ContentSaveButton onClick={handleSave} />
+       {!readOnly && <ContentSaveButton onClick={handleSave} />}
        <ReturnButton onClick={handleReturn} />
 
       </ToolbarGroup>
@@ -205,7 +213,7 @@ const MobileToolbarContent = ({
   </>
 )
 
-export default function SimpleEditorMobile({ content, onContentChange, docTitle, onTitleChange, docId, onSave, onSaveError, onReturn }: SimpleEditorProps) {
+export default function SimpleEditorMobile({ content, onContentChange, docTitle, onTitleChange, docId, onSave, onSaveError, onReturn, readOnly = false, hideToolbar = false, onCustomSave }: SimpleEditorProps) {
   const isMobile = useIsBreakpoint()
   const { height } = useWindowSize()
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
@@ -218,6 +226,7 @@ export default function SimpleEditorMobile({ content, onContentChange, docTitle,
 
   const editor = useEditor({
     immediatelyRender: false,
+    editable: !readOnly,
     editorProps: {
       attributes: {
         autocomplete: "off",
@@ -281,6 +290,13 @@ export default function SimpleEditorMobile({ content, onContentChange, docTitle,
     }
   }, [editor, content]);
 
+  // readOnly 切换时同步 editor 的 editable 状态
+  useEffect(() => {
+    if (editor) {
+      editor.setEditable(!readOnly)
+    }
+  }, [editor, readOnly]);
+
 
   const rect = useCursorVisibility({
     editor,
@@ -305,11 +321,20 @@ export default function SimpleEditorMobile({ content, onContentChange, docTitle,
   };
 
   const handleSave = async () => {
-    if (!docId || !editor) return;
+    if (!editor) return;
+    if (readOnly) return;
 
     try {
-      const content = editor.getJSON();
-      const response = await saveDocApi(docId, { content });
+      const json = editor.getJSON();
+
+      if (onCustomSave) {
+        await onCustomSave(json);
+        onSave?.();
+        return;
+      }
+
+      if (!docId) return;
+      const response = await saveDocApi(docId, { content: json });
       if (response.code === 200) {
         onSave?.();
       } else {
@@ -325,31 +350,34 @@ export default function SimpleEditorMobile({ content, onContentChange, docTitle,
     <div className="simple-editor-wrapper">
 
       <EditorContext.Provider value={{ editor }}>
-        <Toolbar
-          ref={toolbarRef}
-          style={{
-            ...(isMobile
-              ? {
-                  bottom: `calc(100% - ${height - rect.y}px)`,
-                }
-              : {}),
-          }}
-        >
-          {mobileView === "main" ? (
-            <MainToolbarContent
-              onHighlighterClick={() => setMobileView("highlighter")}
-              onLinkClick={() => setMobileView("link")}
-              isMobile={isMobile}
-              handleSave={handleSave}
-              handleReturn={handleReturn}
-            />
-          ) : (
-            <MobileToolbarContent
-              type={mobileView === "highlighter" ? "highlighter" : "link"}
-              onBack={() => setMobileView("main")}
-            />
-          )}
-        </Toolbar>
+        {!hideToolbar && (
+          <Toolbar
+            ref={toolbarRef}
+            style={{
+              ...(isMobile
+                ? {
+                    bottom: `calc(100% - ${height - rect.y}px)`,
+                  }
+                : {}),
+            }}
+          >
+            {mobileView === "main" ? (
+              <MainToolbarContent
+                onHighlighterClick={() => setMobileView("highlighter")}
+                onLinkClick={() => setMobileView("link")}
+                isMobile={isMobile}
+                handleSave={handleSave}
+                handleReturn={handleReturn}
+                readOnly={readOnly}
+              />
+            ) : (
+              <MobileToolbarContent
+                type={mobileView === "highlighter" ? "highlighter" : "link"}
+                onBack={() => setMobileView("main")}
+              />
+            )}
+          </Toolbar>
+        )}
 
         <EditorContent
           editor={editor}

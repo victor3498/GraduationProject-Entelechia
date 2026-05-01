@@ -4,7 +4,7 @@ import type { ButtonProps } from "./button.types";
 
 const variantStyles = {
   primary:
-    "bg-red-600 text-white hover:bg-red-500",
+    "bg-red-600 text-black hover:bg-red-500",
 
   secondary:
     "bg-gray-100 text-gray-900 hover:bg-gray-200",

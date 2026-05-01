@@ -58,15 +58,15 @@ export default function Input({
     let isValid = true;
     /** password 校验 */
     if (variant === "password") {
-      if (!passwordRegex.test(val)) {
-        setError(
-          "密码至少8位，最多13位，需包含字母和数字"
-        
-        );
+      if (val === "") {
+        setError("");
+        isValid = false;
+      } else if (!passwordRegex.test(val)) {
+        setError("密码至少8位，最多13位，需包含字母和数字");
         isValid = false;
       } else {
         setError("");
-         isValid = true;
+        isValid = true;
       }
     }
      onValidChange?.(isValid, val);

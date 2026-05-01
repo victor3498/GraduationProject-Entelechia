@@ -86,3 +86,44 @@ body,
     padding: 1rem 1.5rem 30vh;
   }
 }
+
+/* ===== PDF 导出（html2pdf.js）相关样式 ===== */
+/* 屏外渲染容器：用于克隆编辑器节点并强制白底 */
+.pdf-export-wrapper {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* 让克隆出的编辑器内容保持与正式编辑视图一致的内边距与字体 */
+.pdf-export-wrapper .tiptap.ProseMirror {
+  font-family: "DM Sans", sans-serif;
+  background: #ffffff !important;
+  padding: 2.5rem 2.5rem 2rem;
+  min-height: 0;
+  overflow: visible;
+  caret-color: transparent;
+}
+
+/* 分页友好规则：标题不跟内容被切开，块级元素尽量整体保留 */
+.tiptap.ProseMirror.simple-editor,
+.pdf-export-wrapper .tiptap.ProseMirror {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  img,
+  pre,
+  blockquote,
+  table,
+  figure,
+  hr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

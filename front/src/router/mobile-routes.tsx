@@ -7,6 +7,9 @@ import { ProtectedRoute } from "./guards";
 const MobileLoginOrRes = lazy(() => import("../pages/mobile/MobileLoginOrRes"));
 const MobileMainPage = lazy(() => import("../pages/mobile/MobileMainPage"));
 const MobileEditorPage = lazy(() => import("../pages/mobile/MobileEditorPage"));
+const MobileUserPage = lazy(() => import("../pages/mobile/MobileUserPage"));
+const MobileSharePage = lazy(() => import("../pages/mobile/MobileSharePage"));
+const MobileSharedDocPage = lazy(() => import("../pages/mobile/MobileSharedDocPage"));
 
 export const mobileRoutes: RouteObject[] = [
   {
@@ -32,6 +35,23 @@ export const mobileRoutes: RouteObject[] = [
         <MobileEditorPage />
       </ProtectedRoute>
     ),
+  },
+  {
+    path: "/mobile/user",
+    element: (
+      <ProtectedRoute>
+        <MobileUserPage />
+      </ProtectedRoute>
+    ),
+  },
+  // 分享相关路由：公开访问，不套 ProtectedRoute
+  {
+    path: "/mobile/share",
+    element: <MobileSharePage />,
+  },
+  {
+    path: "/mobile/share/:code",
+    element: <MobileSharedDocPage />,
   },
   {
     path: "*",

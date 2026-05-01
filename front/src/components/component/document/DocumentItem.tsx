@@ -4,12 +4,14 @@ import { Button } from "../ui/Buttton"
 import { Tooltip } from "../ui/Tooltip/Tooltip.tsx"
 import type { DocumentItem } from "./document.types.ts"
 import {DeleteIcon} from "../svg/delete"
+import { ShareIcon } from "../svg/share"
 
 interface DocumentCardProps {
     document: DocumentItem;
     onOpen?: (id:number) => void;
     onStar?: (id:number) => void;
     onDelete?: (id:number) =>void;
+    onShare?: (id:number) =>void;
     width?: string
     height?: string
  
@@ -20,6 +22,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
   onOpen,
   onStar,
   onDelete,
+  onShare,
   width = "170px",
   height = "30px",
 
@@ -57,11 +60,26 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
           e.stopPropagation()
           onDelete?.(id)
         }}
-        className="flex items-center justify-center w-10 h-full text-black bg-transparent hover:text-red-500 hover:bg-neutral-100 transition"
+        className="flex items-center justify-center w-10 h-full text-black bg-transparent hover:bg-red-50 transition"
         height={30}
       >
-        <DeleteIcon />
+        <DeleteIcon className="size-5" />
       </Button>
+
+      {/* share */}
+      {onShare && (
+        <Button
+          onClick={(e) => {
+            e.stopPropagation()
+            onShare(id)
+          }}
+          className="flex items-center justify-center w-10 h-full text-blue-600 bg-transparent hover:bg-blue-50 transition"
+          height={30}
+          title="分享文档"
+        >
+          <ShareIcon className="w-4 h-4" />
+        </Button>
+      )}
 
       <Tooltip
         content={

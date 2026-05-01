@@ -8,6 +8,9 @@ import type { DocumentItem } from "../components/component/document/document.typ
 import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor.tsx'
 import type { JSONContent } from "@tiptap/react"
 import { LogoutIcon } from "@/components/component/svg/logout";
+import { SetIcon } from "@/components/component/svg/set";
+import { ShareIcon } from "@/components/component/svg/share";
+import { ShareDialog } from "@/components/component/document/ShareDialog";
 import content1  from '../components/tiptap-templates/simple/data/content1.json'
 
 
@@ -32,6 +35,8 @@ export default function MainPage() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // 分享弹窗状态：shareDialogDoc 不为 null 即为打开
+  const [shareDialogDoc, setShareDialogDoc] = useState<DocumentItem | null>(null);
 
   // 初始化加载文档
   useEffect(() => {
@@ -324,6 +329,13 @@ export default function MainPage() {
     }
   };
 
+  const handleShareDocument = (id: number) => {
+    const doc = documents.find((d) => d.id === id) || filteredDocuments.find((d) => d.id === id);
+    if (doc) {
+      setShareDialogDoc(doc);
+    }
+  };
+
   const handleViewModeChange = (mode: "all" | "starred") => {
     setViewMode(mode);
     applyViewMode(documents, mode);
@@ -490,6 +502,30 @@ export default function MainPage() {
             >
               ＋
             </Button>
+
+            <Button
+              onClick={() => navigate("/share", { state: { from: "/" } })}
+              variant="ghost"
+              size="lg"
+              width={48}
+              height={48}
+              className="rounded-md flex items-center justify-center hover:bg-gray-800 transition text-white"
+              title="通过分享码访问"
+            >
+              <ShareIcon />
+            </Button>
+
+            <Button
+              onClick={() => navigate("/profile")}
+              variant="ghost"
+              size="lg"
+              width={48}
+              height={48}
+              className="rounded-md flex items-center justify-center hover:bg-gray-800 transition text-white"
+              title="用户设置"
+            >
+              <SetIcon />
+            </Button>
           </div>
 
           {/* 登出按钮 */}
@@ -547,6 +583,7 @@ export default function MainPage() {
                 onOpen={handleOpenDocument}
                 onStar={handleStarDocument}
                 onDelete={handleDeleteDocument}
+                onShare={handleShareDocument}
               />
             )}
           </div>
@@ -556,10 +593,22 @@ export default function MainPage() {
         <div className="flex-1 flex flex-col bg-white overflow-hidden">
           {/* 编辑器顶部栏 */}
           <div className="h-12 border-b border-gray-200 flex items-center px-6 justify-between">
-            <div className="font-medium">
+            <div className="font-medium flex items-center">
               {selectedDoc ? selectedDoc.title : "未选择文档"}
               {selectedDoc && selectedDoc.is_starred && (
                 <span className="ml-2 text-yellow-500">⭐</span>
+              )}
+              {selectedDoc && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="ml-3 text-blue-600 hover:bg-blue-50 rounded-md"
+                  onClick={() => setShareDialogDoc(selectedDoc)}
+                  title="分享当前文档"
+                  leftIcon={<ShareIcon className="w-4 h-4" />}
+                >
+                  分享
+                </Button>
               )}
             </div>
             <div className="text-sm text-gray-500">
@@ -591,6 +640,14 @@ export default function MainPage() {
           </div>
         </div>
       </div>
+
+      {/* 分享弹窗 */}
+      <ShareDialog
+        open={shareDialogDoc !== null}
+        documentId={shareDialogDoc?.id ?? null}
+        documentTitle={shareDialogDoc?.title}
+        onClose={() => setShareDialogDoc(null)}
+      />
     </div>
   );
 }

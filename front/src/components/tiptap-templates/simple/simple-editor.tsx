@@ -59,6 +59,7 @@ import { ContentSaveButton } from "@/components/tiptap-ui/contentsave-button"
 import { ArrowLeftIcon } from "@/components/tiptap-icons/arrow-left-icon"
 import { HighlighterIcon } from "@/components/tiptap-icons/highlighter-icon"
 import { LinkIcon } from "@/components/tiptap-icons/link-icon"
+import { DownloadIcon } from "@/components/tiptap-icons/download-icon"
 
 // --- Hooks ---
 import { useIsBreakpoint } from "@/hooks/use-is-breakpoint"
@@ -70,6 +71,7 @@ import { ThemeToggle } from "@/components/tiptap-templates/simple/theme-toggle"
 
 // --- Lib ---
 import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
+import { exportElementToPdf } from "@/lib/export-pdf"
 
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss"
@@ -86,6 +88,15 @@ interface SimpleEditorProps {
   docId?: number
   onSave?: () => void
   onSaveError?: (error: Error) => void
+  /** 只读模式：禁用编辑、隐藏保存按钮等需要写入操作的功能 */
+  readOnly?: boolean
+  /** 完全隐藏工具栏（一般用于纯查看场景） */
+  hideToolbar?: boolean
+  /**
+   * 自定义保存逻辑。提供时优先于内置 saveDocApi 调用，
+   * 用于「分享码编辑」等不通过 docId 走文档接口的场景。
+   */
+  onCustomSave?: (content: JSONContent) => Promise<void>
 }
 
 const MainToolbarContent = ({
@@ -93,17 +104,24 @@ const MainToolbarContent = ({
   onLinkClick,
   isMobile,
   handleSave,
+  handleExportPdf,
+  isExporting = false,
+  readOnly = false,
 }: {
   onHighlighterClick: () => void
   onLinkClick: () => void
   isMobile: boolean
   handleSave: () => void
+  handleExportPdf: () => void
+  isExporting?: boolean
+  readOnly?: boolean
 }) => {
   return (
     <>
       <Spacer />
 
       <ToolbarGroup>
+        
         <UndoRedoButton action="undo" />
         <UndoRedoButton action="redo" />
       </ToolbarGroup>
@@ -150,10 +168,22 @@ const MainToolbarContent = ({
         <TextAlignButton align="center" />
         <TextAlignButton align="right" />
         <TextAlignButton align="justify" />
-        <ContentSaveButton onClick={handleSave} />
+        {!readOnly && <ContentSaveButton onClick={handleSave} />}
+        {/* <Button
+          data-style="ghost"
+          onClick={handleExportPdf}
+          disabled={isExporting}
+          aria-label="导出 PDF"
+          tooltip={isExporting ? "正在生成 PDF..." : "导出为 PDF"}
+        >
+          <DownloadIcon className="tiptap-button-icon" />
+        </Button> */}
+
       </ToolbarGroup>
 
       <ToolbarSeparator />
+
+
 
       {/* <ToolbarGroup>
         <ImageUploadButton />
@@ -199,19 +229,22 @@ const MobileToolbarContent = ({
   </>
 )
 
-export function SimpleEditor({ content, onContentChange, docTitle, onTitleChange, docId, onSave, onSaveError }: SimpleEditorProps) {
+export function SimpleEditor({ content, onContentChange, docTitle, onTitleChange, docId, onSave, onSaveError, readOnly = false, hideToolbar = false, onCustomSave }: SimpleEditorProps) {
   const isMobile = useIsBreakpoint()
   const { height } = useWindowSize()
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
     "main"
   )
   const [title, setTitle] = useState(docTitle || "未命名文档")
+  const [isExporting, setIsExporting] = useState(false)
   console.log("content传入后:", content);
   const toolbarRef = useRef<HTMLDivElement>(null)
+  const editorContentRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<JSONContent | undefined>(content)
 
   const editor = useEditor({
     immediatelyRender: false,
+    editable: !readOnly,
     editorProps: {
       attributes: {
         autocomplete: "off",
@@ -275,6 +308,13 @@ export function SimpleEditor({ content, onContentChange, docTitle, onTitleChange
     }
   }, [editor, content]);
 
+  // readOnly 切换时同步 editor 的 editable 状态
+  useEffect(() => {
+    if (editor) {
+      editor.setEditable(!readOnly)
+    }
+  }, [editor, readOnly]);
+
 
   const rect = useCursorVisibility({
     editor,
@@ -295,12 +335,50 @@ export function SimpleEditor({ content, onContentChange, docTitle, onTitleChange
     }
   };
 
-  const handleSave = async () => {
-    if (!docId || !editor) return;
+  const handleExportPdf = async () => {
+    if (!editor) return;
+    if (isExporting) return;
+
+    const root = editorContentRef.current;
+    const dom =
+      root?.querySelector<HTMLElement>(".tiptap.ProseMirror") ??
+      (editor.view.dom as HTMLElement);
+
+    if (!dom) {
+      console.warn("导出 PDF 失败：未找到编辑器 DOM");
+      return;
+    }
 
     try {
-      const content = editor.getJSON();
-      const response = await saveDocApi(docId, { content });
+      setIsExporting(true);
+      await exportElementToPdf({
+        element: dom,
+        filename: title || docTitle || "未命名文档",
+      });
+    } catch (error) {
+      console.error("导出 PDF 失败:", error);
+      onSaveError?.(error as Error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!editor) return;
+    if (readOnly) return;
+
+    try {
+      const json = editor.getJSON();
+
+      // 优先使用外部提供的自定义保存逻辑（如分享码 PUT 接口）。
+      if (onCustomSave) {
+        await onCustomSave(json);
+        onSave?.();
+        return;
+      }
+
+      if (!docId) return;
+      const response = await saveDocApi(docId, { content: json });
       if (response.code === 200) {
         onSave?.();
       } else {
@@ -316,32 +394,38 @@ export function SimpleEditor({ content, onContentChange, docTitle, onTitleChange
     <div className="simple-editor-wrapper">
 
       <EditorContext.Provider value={{ editor }}>
-        <Toolbar
-          ref={toolbarRef}
-          style={{
-            ...(isMobile
-              ? {
-                  bottom: `calc(100% - ${height - rect.y}px)`,
-                }
-              : {}),
-          }}
-        >
-          {mobileView === "main" ? (
-            <MainToolbarContent
-              onHighlighterClick={() => setMobileView("highlighter")}
-              onLinkClick={() => setMobileView("link")}
-              isMobile={isMobile}
-              handleSave={handleSave}
-            />
-          ) : (
-            <MobileToolbarContent
-              type={mobileView === "highlighter" ? "highlighter" : "link"}
-              onBack={() => setMobileView("main")}
-            />
-          )}
-        </Toolbar>
+        {!hideToolbar && (
+          <Toolbar
+            ref={toolbarRef}
+            style={{
+              ...(isMobile
+                ? {
+                    bottom: `calc(100% - ${height - rect.y}px)`,
+                  }
+                : {}),
+            }}
+          >
+            {mobileView === "main" ? (
+              <MainToolbarContent
+                onHighlighterClick={() => setMobileView("highlighter")}
+                onLinkClick={() => setMobileView("link")}
+                isMobile={isMobile}
+                handleSave={handleSave}
+                handleExportPdf={handleExportPdf}
+                isExporting={isExporting}
+                readOnly={readOnly}
+              />
+            ) : (
+              <MobileToolbarContent
+                type={mobileView === "highlighter" ? "highlighter" : "link"}
+                onBack={() => setMobileView("main")}
+              />
+            )}
+          </Toolbar>
+        )}
 
         <EditorContent
+          ref={editorContentRef}
           editor={editor}
           role="presentation"
           className="simple-editor-content"
